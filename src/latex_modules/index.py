@@ -89,7 +89,7 @@ class Module (rubber.module_interface.Module):
 
         if names is None:
             self.defaults.append([cmd, args])
-            names = self.indices.keys()
+            names = list(self.indices.keys())
 
         # Then run the command for each index it concerns.
 

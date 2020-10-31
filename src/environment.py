@@ -7,7 +7,7 @@ and the class Environment, which contains all information about a given
 building process.
 """
 
-import os, os.path, sys, subprocess, thread
+import os, os.path, sys, subprocess, _thread
 import re, string
 from subprocess import Popen
 
@@ -94,12 +94,12 @@ class Environment:
 
 			# Define a check function, according to preferences.
 
-			if self.conv_prefs.has_key(t):
+			if t in self.conv_prefs:
 				prefs = self.conv_prefs[t]
 				def do_check (vars, prefs=prefs):
 					if prefs is not None:
-						for key, val in prefs.items():
-							if not (vars.has_key(key) and vars[key] == val):
+						for key, val in list(prefs.items()):
+							if not (key in vars and vars[key] == val):
 								return 0
 					return 1
 			else:
@@ -157,7 +157,7 @@ class Environment:
 			return 1
 
 		penv = os.environ.copy()
-		for (key,val) in env.items():
+		for (key,val) in list(env.items()):
 			penv[key] = val
 
 		if kpse:
@@ -181,11 +181,11 @@ class Environment:
 					if not match:
 						continue
 					cmd = match.group("cmd")
-					if self.kpse_msg.has_key(cmd):
+					if cmd in self.kpse_msg:
 						msg.progress(match.expand(self.kpse_msg[cmd]))
 					else:
 						msg.progress(_("kpathsea running %s") % cmd)
-			thread.start_new_thread(parse_kpse, ())
+			_thread.start_new_thread(parse_kpse, ())
 
 		if out is not None:
 			for line in process.stdout:
@@ -196,3 +196,7 @@ class Environment:
 		ret = process.wait()
 		msg.log(_("process %d (%s) returned %d") % (process.pid, prog[0],ret))
 		return ret
+
+# Local Variables:
+# indent-tabs-mode: t
+# End:

@@ -4,7 +4,7 @@ rule management.
 """
 
 import re, imp, os.path
-from ConfigParser import *
+from configparser import *
 
 from rubber.util import _, msg
 import rubber.util
@@ -184,7 +184,7 @@ class Converter (object):
 		this converter, i.e. if it matches one of the target regular
 		expressions.
 		"""
-		for rule in self.rules.values():
+		for rule in list(self.rules.values()):
 			if rule.re_target.match(name):
 				return True
 		return False
@@ -202,7 +202,7 @@ class Converter (object):
 		"""
 		candidates = []
 
-		for rule in self.rules.values():
+		for rule in list(self.rules.values()):
 			match = rule.re_target.match(target)
 			if not match:
 				continue

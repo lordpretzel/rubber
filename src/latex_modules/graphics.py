@@ -75,8 +75,8 @@ class Module (rubber.module_interface.Module):
 
         opts = parse_keyval(context['opt'])
 
-        for opt in opts.keys():
-            if drv_suffixes.has_key(opt):
+        for opt in list(opts.keys()):
+            if opt in drv_suffixes:
                 self.suffixes = drv_suffixes[opt]
 
         document.vars['graphics_suffixes'] = self.suffixes

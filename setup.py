@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python
 # vim: et:ts=4
 #
 # This is the setup script for Rubber. It acts both as a part of the
@@ -64,7 +64,7 @@ class build (distutils.command.build.build):
                 setattr (self, fmt, value)
 
     def generate_files_with_substitutions (self, subs):
-        pattern = "|".join (subs.keys ())
+        pattern = "|".join (list(subs.keys ()))
         pattern = "@(" + pattern + ")@"
         pattern = re.compile (pattern)
         def repl (match_object):
@@ -200,7 +200,7 @@ def extract_version_from_first_line (news, pattern):
 
 distutils.core.setup (
     name = "rubber",
-    version = extract_version_from_first_line ("NEWS", r'^Version ([0-9.]+) '),
+    version = "1.4",
     description = "an automated system for building LaTeX documents",
     long_description = """\
 This is a building system for LaTeX documents. It is based on a routine that

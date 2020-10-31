@@ -87,11 +87,11 @@ class BibToolDep (rubber.depend.Node):
 
 					filename = self.find_bib (filename) or filename
 
-                    # oracleyue: fix bug when no citation entry
-                    if m.group("line") is not None:
-				        line = int (m.group ("line"))
-                    else:
-                        line = int (0)
+		# oracleyue: fix bug when no citation entry
+					if m.group("line") is not None:
+						line = int (m.group ("line"))
+					else:
+						line = int (0)
 
 					d =	{
 						"pkg": "bibtex",
@@ -194,3 +194,7 @@ class BibTeXDep (BibToolDep):
 		elif name not in [ "plain", "alpha", "apalike", "plainnat", "abbrvnat", "unsrtnat" ]:
 			# do not complain about default styles coming with bibtex
 			msg.warn (_ ("cannot find bibliography style %s") % name, pkg="biblio")
+
+# Local Variables:
+# indent-tabs-mode: t
+# End:

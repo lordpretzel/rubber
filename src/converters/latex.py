@@ -48,7 +48,7 @@ class Modules:
 		"""
 		Check if a given module is loaded.
 		"""
-		return self.objects.has_key(name)
+		return name in self.objects
 
 	def register (self, name, context={}):
 		"""
@@ -57,7 +57,7 @@ class Modules:
 		load it, initialise it (using the context passed as optional argument)
 		and run any delayed commands for it.
 		"""
-		if self.has_key(name):
+		if name in self:
 			msg.debug(_("module %s already registered") % name, pkg='latex')
 			return 2
 
@@ -110,7 +110,7 @@ class Modules:
 
 		# Run any delayed commands.
 
-		if self.commands.has_key(name):
+		if name in self.commands:
 			for (cmd, args, vars) in self.commands[name]:
 				msg.push_pos(vars)
 				try:
@@ -139,10 +139,10 @@ class Modules:
 		Send a command to a particular module. If this module is not loaded,
 		store the command so that it will be sent when the module is register.
 		"""
-		if self.objects.has_key(mod):
+		if mod in self.objects:
 			self.objects[mod].command(cmd, args)
 		else:
-			if not self.commands.has_key(mod):
+			if mod not in self.commands:
 				self.commands[mod] = []
 			self.commands[mod].append((cmd, args, self.env.vars))
 
@@ -292,7 +292,7 @@ class LogCheck (object):
 					m = re_cseq.match(line)
 					if m:
 						seq = m.group("seq")
-						if cseqs.has_key(seq):
+						if seq in cseqs:
 							error = None
 						else:
 							cseqs[seq] = None
@@ -321,7 +321,7 @@ class LogCheck (object):
 						m = re_ignored.search(error)
 						if m:
 							d["file"] = last_file
-							if d.has_key("code"):
+							if "code" in d:
 								del d["code"]
 							d.update( m.groupdict() )
 						elif pos[-1] is None:
@@ -516,7 +516,7 @@ class SourceParser (rubber.tex.Parser):
 			if match is None:
 				return True
 
-			vars = dict(self.latex_dep.vars.items())
+			vars = dict(list(self.latex_dep.vars.items()))
 			vars['line'] = self.pos_line
 			args = parse_line(match.group("arg"), vars)
 
@@ -744,11 +744,11 @@ class LaTeXDep (rubber.depend.Node):
 		the included sources.
 		"""
 		parser = SourceParser(file, self)
-		parser.set_hooks(self.hooks.keys())
+		parser.set_hooks(list(self.hooks.keys()))
 		self.hooks_changed = False
 		while True:
 			if self.hooks_changed:
-				parser.set_hooks(self.hooks.keys())
+				parser.set_hooks(list(self.hooks.keys()))
 				self.hooks_changed = False
 			token = parser.next_hook()
 			if token.cat == EOF:
@@ -771,7 +771,7 @@ class LaTeXDep (rubber.depend.Node):
 		This method is called when an included file is processed. The argument
 		must be a valid file name.
 		"""
-		if self.processed_sources.has_key(path):
+		if path in self.processed_sources:
 			msg.debug(_("%s already parsed") % path, pkg='latex')
 			return
 		self.processed_sources[path] = None
@@ -858,7 +858,7 @@ class LaTeXDep (rubber.depend.Node):
 		#	msg.warn(_("wrong syntax for '%s'") % cmd, **pos)
 
 	def do_alias (self, name, val):
-		if self.hooks.has_key(val):
+		if val in self.hooks:
 			self.hooks[name] = self.hooks[val]
 			self.hooks_changed = True
 
@@ -979,11 +979,11 @@ class LaTeXDep (rubber.depend.Node):
 	# Now the macro handlers:
 
 	def h_begin (self, loc, env):
-		if self.begin_hooks.has_key(env):
+		if env in self.begin_hooks:
 			self.begin_hooks[env](loc)
 
 	def h_end (self, loc, env):
-		if self.end_hooks.has_key(env):
+		if env in self.end_hooks:
 			self.end_hooks[env](loc)
 
 	def h_pdfoutput (self, loc):
@@ -1042,7 +1042,7 @@ class LaTeXDep (rubber.depend.Node):
 		source in a way very similar to \\input, except that LaTeX also
 		creates .aux files for them, so we have to notice this.
 		"""
-		if self.include_only and not self.include_only.has_key(filename):
+		if self.include_only and filename not in self.include_only:
 			return
 		file, _ = self.input_file(filename, loc)
 		if file:
@@ -1251,7 +1251,7 @@ class LaTeXDep (rubber.depend.Node):
 		"""
 		msg.log(_("building additional files..."), pkg='latex')
 
-		for mod in self.modules.objects.values():
+		for mod in list(self.modules.objects.values()):
 			if not mod.pre_compile():
 				self.failed_module = mod
 				return False
@@ -1265,7 +1265,7 @@ class LaTeXDep (rubber.depend.Node):
 		"""
 		msg.log(_("running post-compilation scripts..."), pkg='latex')
 
-		for file, md5 in self.onchange_md5.items():
+		for file, md5 in list(self.onchange_md5.items()):
 			new = md5_file(file)
 			if md5 != new:
 				self.onchange_md5[file] = new
@@ -1274,7 +1274,7 @@ class LaTeXDep (rubber.depend.Node):
 					# FIXME portability issue: explicit reference to shell
 					self.env.execute(["sh", "-c", self.onchange_cmd[file]])
 
-		for mod in self.modules.objects.values():
+		for mod in list(self.modules.objects.values()):
 			if not mod.post_compile():
 				self.failed_module = mod
 				return False
@@ -1288,7 +1288,7 @@ class LaTeXDep (rubber.depend.Node):
 		for file in self.removed_files:
 			rubber.util.verbose_remove (file, pkg = "latex")
 		msg.log(_("cleaning additional files..."), pkg='latex')
-		for mod in self.modules.objects.values():
+		for mod in list(self.modules.objects.values()):
 			mod.clean()
 
 	#--  Building routine  {{{2

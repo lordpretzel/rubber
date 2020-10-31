@@ -261,7 +261,7 @@ available options:
 		base, ext = os.path.splitext (path)
 
 		from rubber.converters.literate import literate_preprocessors as lpp
-		if ext in lpp.keys ():
+		if ext in list(lpp.keys ()):
 			src = base + ".tex"
 			# FIXME kill src_node
 			src_node = lpp[ext] (self.env.depends, src, path)
@@ -379,7 +379,7 @@ available options:
 		Remove all products.
 		This function should never throw or call exit
 		"""
-		for dep in env.final.set.values ():
+		for dep in list(env.final.set.values ()):
 			dep.clean ()
 
 	def build (self, env):
@@ -598,7 +598,7 @@ actions:
 	def process_source (self, env):
 		if self.info_action == "deps":
 			from rubber.depend import Leaf
-			deps = [ k for k,n in env.depends.iteritems () if type (n) is Leaf ]
+			deps = [ k for k,n in env.depends.items () if type (n) is Leaf ]
 			rubber.util.stdout_write (string.join (deps))
 
 		elif self.info_action == "rules":
@@ -607,13 +607,13 @@ actions:
 			while len(next) > 0:
 				node = next[0]
 				next = next[1:]
-				if seen.has_key(node):
+				if node in seen:
 					continue
 				seen[node] = None
 				if len(node.sources) == 0:
 					continue
-				print ("\n%s:" % string.join(node.products))
-				print (string.join(node.sources))
+				print(("\n%s:" % string.join(node.products)))
+				print((string.join(node.sources)))
 				next.extend(node.source_nodes())
 		else:
 			self.info_log (self.info_action)

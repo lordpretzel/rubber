@@ -47,7 +47,7 @@ class Node (object):
 		Register a new source for this node. If the source is unknown, a leaf
 		node is made for it.
 		"""
-		if not self.set.has_key(name):
+		if name not in self.set:
 			self.set[name] = Leaf(self.set, name)
 		if name not in self.sources:
 			self.sources.append(name)
@@ -63,7 +63,7 @@ class Node (object):
 		Remove a source for this node.
 		"""
 		self.sources.remove (name)
-		if self.md5_for_source.has_key (name):
+		if name in self.md5_for_source:
 			del self.md5_for_source[name]
 
 	def add_product (self, name):
@@ -105,7 +105,7 @@ class Node (object):
 			# NB: we ignore the case source.date == None (missing dependency) here.
 			# NB2: to be extra correct, equal (disk-precision) timestamps trigger a recompile.
 			if source.date is not None and source.date >= self.date:
-				if self.md5_for_source.has_key (source_name):
+				if source_name in self.md5_for_source:
 					if self.md5_for_source[source_name] == rubber.util.md5_file (source_name):
 						msg.debug(_("while making %s: contents of %s unchanged, ignoring mtime") % (self.products[0], source_name), pkg="depend")
 						continue
@@ -171,7 +171,7 @@ class Node (object):
 				return rv
 
 			# record MD5 hash of source files as we now actually start the build
-			for source_name in self.md5_for_source.keys ():
+			for source_name in list(self.md5_for_source.keys ()):
 				self.md5_for_source[source_name] = rubber.util.md5_file (source_name)
 
 			# actually make

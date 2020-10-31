@@ -31,10 +31,8 @@ import abc
 from rubber import msg, _
 import rubber.util
 
-class Module:
+class Module(metaclass=abc.ABCMeta):
     # This class may not be instantiated directly, only subclassed.
-    __metaclass__ = abc.ABCMeta
-
     """
     This is the base class for modules. Each module should define a class
     named 'Module' that derives from this one. The default implementation

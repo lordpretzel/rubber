@@ -25,10 +25,8 @@ import rubber.util
 product_extension = { 'dvips':'ps', 'dvipdfm':'pdf' }
 paper_selection_option = { 'dvips':'-t', 'dvipdfm':'-p' }
 
-class Module (rubber.depend.Node, rubber.module_interface.Module):
+class Module (rubber.depend.Node, rubber.module_interface.Module, metaclass=abc.ABCMeta):
     # This class may not be instantiated directly, only subclassed.
-    __metaclass__ = abc.ABCMeta
-
     def __init__ (self, document, context, tool):
         super (Module, self).__init__ (document.env.depends)
 

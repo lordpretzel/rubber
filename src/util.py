@@ -63,8 +63,8 @@ class Message (object):
 			if text[0:13] == "LaTeX Error: ":
 				text = text[13:]
 			self(0, self.format_pos(info, text))
-			if info.has_key("code") and info["code"] and not self.short:
-				if info.has_key("macro"):
+			if "code" in info and info["code"] and not self.short:
+				if "macro" in info:
 					del info["macro"]
 				self(0, self.format_pos(info,
 					_("leading text: ") + info["code"]))
@@ -99,26 +99,26 @@ class Message (object):
 		the dictionary given as first argument.
 		"""
 		if len(self.pos) > 0:
-			if where is None or not where.has_key("file"):
+			if where is None or "file" not in where:
 				where = self.pos[-1]
 		elif where is None or where == {}:
 			return text
 
-		if where.has_key("file") and where["file"] is not None:
+		if "file" in where and where["file"] is not None:
 			pos = self.simplify(where["file"])
-			if where.has_key("line") and where["line"]:
+			if "line" in where and where["line"]:
 				pos = "%s:%d" % (pos, int(where["line"]))
-				if where.has_key("last"):
+				if "last" in where:
 					if where["last"] != where["line"]:
 						pos = "%s-%d" % (pos, int(where["last"]))
 			pos = pos + ": "
 		else:
 			pos = ""
-		if where.has_key("macro"):
+		if "macro" in where:
 			text = "%s (in macro %s)" % (text, where["macro"])
-		if where.has_key("page"):
+		if "page" in where:
 			text = "%s (page %d)" % (text, int(where["page"]))
-		if where.has_key("pkg"):
+		if "pkg" in where:
 			text = "[%s] %s" % (where["pkg"], text)
 		return pos + text
 
@@ -223,7 +223,7 @@ def prog_available (prog):
 	"""
 	pathsep = ";" if os.name == "nt" else ":"
 	fileext = ".exe" if os.name == "nt" else ""
-	if checked_progs.has_key(prog):
+	if prog in checked_progs:
 		return checked_progs[prog]
 	for path in os.getenv("PATH").split(pathsep):
 		file = os.path.join(path, prog) + fileext
@@ -238,9 +238,7 @@ def prog_available (prog):
 
 #-- Variable handling --{{{1
 
-import UserDict
-
-class Variables (UserDict.DictMixin):
+class Variables (dict):
 	"""
 	This class represent an environment containing variables. It can be
 	accessed as a dictionary, except that every key must be declared using the
@@ -258,6 +256,7 @@ class Variables (UserDict.DictMixin):
 		Create an environment, possibly with a parent environment, and initial
 		bindings.
 		"""
+		dict.__init__(self,items)
 		if parent is not None and not isinstance(parent, Variables):
 			raise ValueError()
 		self.parent = parent
@@ -269,8 +268,8 @@ class Variables (UserDict.DictMixin):
 		"""
 		object = self
 		while object is not None:
-			if object.dict.has_key(key):
-				return object.dict[key]
+			if dict.has_key(object,key):
+				return dict.__getitem__(object,key)
 			object = object.parent
 		raise KeyError
 
@@ -282,8 +281,8 @@ class Variables (UserDict.DictMixin):
 		"""
 		object = self
 		while object is not None:
-			if object.dict.has_key(key):
-				object.dict[key] = value
+			if key in object:
+				dict.__setitem__(object, key, value)
 				return
 			object = object.parent
 		raise KeyError
@@ -293,9 +292,9 @@ class Variables (UserDict.DictMixin):
 		Return the set of keys defined in this environment and its parents.
 		"""
 		if self.parent is None:
-			return set(self.dict.keys())
+			return set(dict.keys(self))
 		else:
-			return set(self.parent.keys()) | set(self.dict.keys())
+			return set(self.parent.keys()) | set(dict.keys(self))
 
 	def new_key (self, key, value):
 		"""
@@ -304,9 +303,9 @@ class Variables (UserDict.DictMixin):
 		raises 'KeyError'. If the variable exists in a parent environment, it
 		is hidden by the new variable.
 		"""
-		if self.dict.has_key(key):
+		if dict.has_key(self,key):
 			raise KeyError
-		self.dict[key] = value
+		dict.__setitem__(self, key, value)
 
 #-- Parsing commands --{{{1
 
@@ -379,7 +378,7 @@ def parse_line (line, dict):
 				# Append the variable or its name.
 
 				if dict:
-					if dict.has_key(name):
+					if name in dict:
 						arg = arg + str(dict[name])
 					# Send a warning for undefined variables ?
 				else:
@@ -480,3 +479,7 @@ def abort_rubber_syntax_error ():
 def abort_generic_error ():
 	"""errors running LaTeX, finding essential files, etc."""
 	sys.exit (2)
+
+# Local Variables:
+# indent-tabs-mode: t
+# End:

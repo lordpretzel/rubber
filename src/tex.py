@@ -7,7 +7,7 @@ Classes and functions from this module can be used without Rubber.
 """
 
 import codecs, re
-from StringIO import StringIO
+from io import StringIO
 
 # The catcodes
 
@@ -152,7 +152,7 @@ class ParserBase (object):
 		"""
 		Return the catcode of a character.
 		"""
-		if self.catcodes.has_key(char):
+		if char in self.catcodes:
 			return self.catcodes[char]
 		else:
 			return OTHER
@@ -175,7 +175,7 @@ class ParserBase (object):
 		"""
 		Return the next token that will be read without updating the state.
 		"""
-		if len(self.next) > 0:
+		if len(self.__next__) > 0:
 			return self.next[-1]
 		token = self.read_token()
 		self.put_token(token)
@@ -185,14 +185,14 @@ class ParserBase (object):
 		"""
 		Get the next token from the input and update the math mode.
 		"""
-		if len(self.next) > 0:
+		if len(self.__next__) > 0:
 			token = self.next.pop()
 		else:
 			token = self.read_token()
 
 		# skip over comment
 		if token.cat == COMMENT:
-			assert len(self.next) == 0
+			assert len(self.__next__) == 0
 			assert self.next_char is None
 			self.read_line()
 			return self.read_token()
@@ -472,14 +472,14 @@ class Parser (ParserBase):
 		Returns a regular expression that maches characters whose category is
 		in given list.
 		"""
-		return re_set([char for char,code in self.catcodes.items() if code in cat])
+		return re_set([char for char,code in list(self.catcodes.items()) if code in cat])
 
 	def re_nocat (self, *cat):
 		"""
 		Returns a regular expression that maches characters whose category is
 		not in a given list.
 		"""
-		return re_set([char for char,code in self.catcodes.items() if code in cat], True)
+		return re_set([char for char,code in list(self.catcodes.items()) if code in cat], True)
 
 	def set_hooks (self, names):
 		"""
