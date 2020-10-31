@@ -175,7 +175,7 @@ class ParserBase (object):
 		"""
 		Return the next token that will be read without updating the state.
 		"""
-		if len(self.__next__) > 0:
+		if len(self.next) > 0:
 			return self.next[-1]
 		token = self.read_token()
 		self.put_token(token)
@@ -185,14 +185,14 @@ class ParserBase (object):
 		"""
 		Get the next token from the input and update the math mode.
 		"""
-		if len(self.__next__) > 0:
+		if len(self.next) > 0:
 			token = self.next.pop()
 		else:
 			token = self.read_token()
 
 		# skip over comment
 		if token.cat == COMMENT:
-			assert len(self.__next__) == 0
+			assert len(self.next) == 0
 			assert self.next_char is None
 			self.read_line()
 			return self.read_token()

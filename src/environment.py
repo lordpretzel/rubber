@@ -145,7 +145,7 @@ class Environment:
 		messages from Kpathsea are processed (to indicate e.g. font
 		compilation), otherwise the error output is kept untouched.
 		"""
-		msg.info(_("executing: %s") % string.join(prog))
+		msg.info(_("executing: %s") % " ".join(prog))
 		if pwd:
 			msg.log(_("  in directory %s") % pwd)
 		if env != {}:
@@ -177,7 +177,7 @@ class Environment:
 			def parse_kpse ():
 				for line in process.stderr:
 					line = line.rstrip()
-					match = re_kpse.match(line)
+					match = re_kpse.match(line.decode("utf-8"))
 					if not match:
 						continue
 					cmd = match.group("cmd")

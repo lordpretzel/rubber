@@ -143,13 +143,13 @@ class Module (rubber.module_interface.Module):
 
     def hook_declareExtensions (self, loc, list):
         for suffix in list.split(","):
-            self.suffixes.insert(0, string.strip(suffix))
+            self.suffixes.insert(0, suffix.strip())
 
     def hook_declareRule (self, loc, ext, type, read, command):
         if read in self.suffixes:
             return
         self.suffixes.insert(0, read)
-        msg.log("*** FIXME ***  rule %s -> %s [%s]" % (string.strip (ext), read, type), pkg='graphics')
+        msg.log("*** FIXME ***  rule %s -> %s [%s]" % (ext.strip(), read, type), pkg='graphics')
 
     #  module interface
 

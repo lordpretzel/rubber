@@ -223,7 +223,7 @@ class LogCheck (object):
 				# sometimes issues warnings (like undefined references) in the
 				# form of errors...
 
-				if string.find(line, "pdfTeX warning") == -1:
+				if line.find("pdfTeX warning") == -1:
 					return 1
 		return 0
 
@@ -304,7 +304,7 @@ class LogCheck (object):
 				if m:
 					parsing = 0
 					skipping = 1
-					pdfTeX = string.find(line, "pdfTeX warning") != -1
+					pdfTeX = line.find("pdfTeX warning") != -1
 					if error is not None and ((pdfTeX and warnings) or (errors and not pdfTeX)):
 						if pdfTeX:
 							d = {
@@ -372,7 +372,7 @@ class LogCheck (object):
 
 			if prefix is not None:
 				if line[:len(prefix)] == prefix:
-					text.append(string.strip(line[len(prefix):]))
+					text.append(line[len(prefix):].strip())
 				else:
 					text = " ".join(text)
 					m = re_online.search(text)
@@ -533,11 +533,11 @@ class SourceParser (rubber.tex.Parser):
 			self.pos_char += match.end()
 			return
 
-class EndDocument:
+class EndDocument(BaseException):
 	""" This is the exception raised when \\end{document} is found. """
 	pass
 
-class EndInput:
+class EndInput(BaseException):
 	""" This is the exception raised when \\endinput is found. """
 	pass
 
@@ -845,7 +845,7 @@ class LaTeXDep (rubber.depend.Node):
 			pos = self.vars
 		# Calls to this method are actually translated into calls to "do_*"
 		# methods, except for calls to module directives.
-		lst = string.split(cmd, ".", 1)
+		lst = cmd.split(".", 1)
 		#try:
 		if len(lst) > 1:
 			self.modules.command(lst[0], lst[1], args)
@@ -1081,7 +1081,7 @@ class LaTeXDep (rubber.depend.Node):
 		unless there is a supporting module in the current directory,
 		otherwise it is treated as a package.
 		"""
-		for name in string.split(names, ","):
+		for name in names.split(","):
 			name = name.strip()
 			if name == '': continue  # \usepackage{a,}
 			file = self.env.find_file(name + ".sty")
@@ -1218,7 +1218,7 @@ class LaTeXDep (rubber.depend.Node):
 				paths.append("." + p[len(prefix):])
 			else:
 				paths.append(p)
-		inputs = string.join(paths, ":")
+		inputs = ":".join(paths)
 
 		if inputs == "":
 			env = {}

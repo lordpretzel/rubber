@@ -152,7 +152,7 @@ def md5_file (fname):
 		m = hashlib.md5()
 		with open(fname) as file:
 			for line in file:
-				m.update(line)
+				m.update(line.encode("utf-8"))
 		return m.digest()
 	except IOError as e:
 		if e.errno == errno.ENOENT:
@@ -189,7 +189,7 @@ def parse_keyval (str):
 			val, str = match_brace(str)
 			dict[d["key"]] = val
 		else:
-			dict[d["key"]] = string.strip(d["val"])
+			dict[d["key"]] = d["val"].strip()
 	return dict
 
 def match_brace (str):
@@ -268,7 +268,7 @@ class Variables (dict):
 		"""
 		object = self
 		while object is not None:
-			if dict.has_key(object,key):
+			if key in dict.keys(object):
 				return dict.__getitem__(object,key)
 			object = object.parent
 		raise KeyError
@@ -303,7 +303,7 @@ class Variables (dict):
 		raises 'KeyError'. If the variable exists in a parent environment, it
 		is hidden by the new variable.
 		"""
-		if dict.has_key(self,key):
+		if key in dict.keys(self):
 			raise KeyError
 		dict.__setitem__(self, key, value)
 
@@ -408,7 +408,7 @@ devnull_fp = None
 def devnull ():
 	global devnull_fp
 	if not devnull_fp:
-		devnull_fp = open(os.devnull, 'rw')
+		devnull_fp = open(os.devnull, 'r+')
 	return devnull_fp
 
 def explode_path (name = "PATH"):

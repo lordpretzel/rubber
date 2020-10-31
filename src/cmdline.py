@@ -599,7 +599,7 @@ actions:
 		if self.info_action == "deps":
 			from rubber.depend import Leaf
 			deps = [ k for k,n in env.depends.items () if type (n) is Leaf ]
-			rubber.util.stdout_write (string.join (deps))
+			rubber.util.stdout_write (" ".join(deps))
 
 		elif self.info_action == "rules":
 			seen = {}
@@ -612,8 +612,8 @@ actions:
 				seen[node] = None
 				if len(node.sources) == 0:
 					continue
-				print(("\n%s:" % string.join(node.products)))
-				print((string.join(node.sources)))
+				print(("\n%s:" % " ".join(node.products)))
+				print((" ".join(node.sources)))
 				next.extend(node.source_nodes())
 		else:
 			self.info_log (self.info_action)

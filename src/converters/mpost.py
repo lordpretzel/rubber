@@ -131,7 +131,7 @@ class Dep (rubber.depend.Node):
 		if self.env.path == [""]:
 			self.penv = {}
 		else:
-			path = string.join(self.env.path, ":")
+			path = ":".join(self.env.path)
 			self.penv = {
 				"TEXINPUTS": "%s:%s" % (path, os.getenv("TEXINPUTS", "")),
 				"MPINPUTS": "%s:%s" % (path, os.getenv("MPINPUTS", "")) }
